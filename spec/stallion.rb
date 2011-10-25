@@ -120,7 +120,7 @@ Stallion.saddle :spec do |stable|
       stable.response.write stable.request.env["HTTP_COOKIE"]
 
     elsif stable.request.path_info == '/timeout'
-      sleep(10)
+      sleep(20) # sleep for longer than the default timeout
       stable.response.write 'timeout'
 
     elsif stable.request.path_info == '/cookie_parrot'

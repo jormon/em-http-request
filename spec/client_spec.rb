@@ -383,7 +383,35 @@ describe EventMachine::HttpRequest do
       http.callback { failed(http) }
     }
   end
+  
+  it "should default to 10s inactivity timeout" do
+    EventMachine.run {
+      t = Time.now.to_i
+      EventMachine.heartbeat_interval = 1
+      http = EventMachine::HttpRequest.new('http://127.0.0.1:8090/timeout').get
 
+      http.errback {
+        (Time.now.to_i - t).should <= 11
+        EventMachine.stop
+      }
+      http.callback { failed(http) }
+    }
+  end
+  
+  it 'should timeout after 10 seconds if you tell it to' do
+    EventMachine.run {
+      t = Time.now.to_f
+      EventMachine.heartbeat_interval = 1
+      http = EventMachine::HttpRequest.new('http://127.0.0.1:8090/timeout', :inactivity_timeout => 10).get
+
+      http.errback {
+        (Time.now.to_f - t).should <= 11
+        EventMachine.stop
+      }
+      http.callback { failed(http) }
+    }
+  end
+  
   it "should complete a Location: with a relative path" do
     EventMachine.run {
       http = EventMachine::HttpRequest.new('http://127.0.0.1:8090/relative-location').get
